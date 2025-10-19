@@ -2,7 +2,7 @@
 
 import { Link, Outlet } from "react-router-dom";
 import SignOutButton from "@/components/SignOutButton";
-// Ensure SignOutButton.tsx and your other components are in the right path
+import { ThemeToggle } from "@/components/ThemeToggle"; // 👈 IMPORT THE THEME TOGGLER
 
 export default function MainLayout() {
   return (
@@ -34,8 +34,14 @@ export default function MainLayout() {
             Hospital Settings
           </Link>
 
-          {/* Sign Out Button */}
-          <SignOutButton />
+          {/* 💥 THEME TOGGLER 💥 */}
+          {/* We use space-x-2 here to create a small gap between the toggler and the sign-out button */}
+          <div className="flex items-center space-x-2">
+            <ThemeToggle />
+
+            {/* Sign Out Button */}
+            <SignOutButton />
+          </div>
         </nav>
       </header>
 

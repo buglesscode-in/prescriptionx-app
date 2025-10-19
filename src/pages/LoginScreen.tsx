@@ -12,15 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
-// 👈 Import both auth functions (assuming you created registerUser in your auth.ts)
 import { loginUser, registerUser } from "@/firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/authContextDefinition";
+import { ThemeToggle } from "@/components/ThemeToggle"; // 👈 IMPORT THE THEME TOGGLER
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // 💥 NEW STATE: To toggle between 'login' and 'signup' modes
   const [isSignUp, setIsSignUp] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -36,7 +35,7 @@ export default function LoginScreen() {
     }
   }, [currentUser, authLoading, navigate]);
 
-  // 💥 NEW/MODIFIED HANDLER 💥
+  // 💥 AUTH SUBMISSION HANDLER (NO CHANGE) 💥
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -44,12 +43,8 @@ export default function LoginScreen() {
 
     try {
       if (isSignUp) {
-        // Use the register function if in Sign Up mode
         await registerUser(email, password);
-        // After successful sign-up, the user is automatically logged in.
-        // The useEffect hook will handle the redirect.
       } else {
-        // Use the login function if in Sign In mode
         await loginUser(email, password);
       }
     } catch (err: any) {
@@ -68,7 +63,7 @@ export default function LoginScreen() {
     );
   }
 
-  // Determine button/title text based on mode
+  // Determine button/title text based on mode (NO CHANGE)
   const title = isSignUp ? "Create Account" : "Sign In";
   const description = isSignUp
     ? "Enter your details to create a new prescription account."
@@ -79,14 +74,20 @@ export default function LoginScreen() {
     : "Don't have an account? Sign Up";
 
   return (
-    <div className="flex h-screen items-center justify-center bg-background">
+    // 💥 WRAPPER DIV MODIFIED FOR THEME TOGGLER POSITIONING 💥
+    <div className="relative flex h-screen items-center justify-center bg-background">
+      {/* Position the Theme Toggler in the top right corner */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      {/* Login Card */}
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* 💥 USE THE COMBINED HANDLER 💥 */}
           <form onSubmit={handleAuthSubmit} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -118,13 +119,12 @@ export default function LoginScreen() {
               {loading ? "Processing..." : submitText}
             </Button>
 
-            {/* 💥 TOGGLE BUTTON 💥 */}
             <Button
               variant="link"
-              type="button" // Important: prevents form submission
+              type="button"
               onClick={() => {
                 setIsSignUp((prev) => !prev);
-                setError(null); // Clear errors when switching modes
+                setError(null);
               }}
               className="text-center text-sm"
             >
