@@ -1,25 +1,18 @@
 // src/pages/LoginScreen.tsx
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
-import { loginUser, registerUser } from "@/firebase/auth";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/authContextDefinition";
-import { ThemeToggle } from "@/components/ThemeToggle"; // 👈 IMPORT THE THEME TOGGLER
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState, useEffect } from 'react';
+import { loginUser, registerUser } from '@/firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/authContextDefinition';
+import { ThemeToggle } from '@/components/ThemeToggle'; // 👈 IMPORT THE THEME TOGGLER
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +24,7 @@ export default function LoginScreen() {
   // 1. Redirect if user is already logged in (NO CHANGE)
   useEffect(() => {
     if (!authLoading && currentUser) {
-      navigate("/", { replace: true });
+      navigate('/', { replace: true });
     }
   }, [currentUser, authLoading, navigate]);
 
@@ -64,13 +57,13 @@ export default function LoginScreen() {
   }
 
   // Determine button/title text based on mode (NO CHANGE)
-  const title = isSignUp ? "Create Account" : "Sign In";
+  const title = isSignUp ? 'Create Account' : 'Sign In';
   const description = isSignUp
-    ? "Enter your details to create a new prescription account."
-    : "Enter your email and password to access PrescriptionX.";
-  const submitText = isSignUp ? "Sign Up" : "Sign In";
+    ? 'Enter your details to create a new prescription account.'
+    : 'Enter your email and password to access PrescriptionX.';
+  const submitText = isSignUp ? 'Sign Up' : 'Sign In';
   const toggleText = isSignUp
-    ? "Already have an account? Sign In"
+    ? 'Already have an account? Sign In'
     : "Don't have an account? Sign Up";
 
   return (
@@ -111,12 +104,10 @@ export default function LoginScreen() {
               />
             </div>
 
-            {error && (
-              <p className="text-sm font-medium text-destructive">{error}</p>
-            )}
+            {error && <p className="text-sm font-medium text-destructive">{error}</p>}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Processing..." : submitText}
+              {loading ? 'Processing...' : submitText}
             </Button>
 
             <Button

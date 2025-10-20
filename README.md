@@ -1,1 +1,1 @@
-Deployed URL:  https://prescriptionx.netlify.app/
+Deployed URL: https://prescriptionx.netlify.app/

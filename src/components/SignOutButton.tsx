@@ -1,8 +1,8 @@
 // src/components/SignOutButton.tsx
 
-import { Button } from "@/components/ui/button";
-import { logoutUser } from "@/firebase/auth"; // Ensure this path is correct
-import { LogOut } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { logoutUser } from '@/firebase/auth'; // Ensure this path is correct
+import { LogOut } from 'lucide-react';
 
 export default function SignOutButton() {
   const handleSignOut = async () => {
@@ -10,8 +10,8 @@ export default function SignOutButton() {
       await logoutUser();
       // The ProtectedRoute logic will automatically redirect to /login
     } catch (error) {
-      console.error("Logout failed:", error);
-      alert("Failed to sign out. Please try again.");
+      console.error('Logout failed:', error);
+      alert('Failed to sign out. Please try again.');
     }
   };
 

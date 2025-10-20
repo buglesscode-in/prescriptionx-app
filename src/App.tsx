@@ -1,12 +1,12 @@
 // src/App.tsx (Final structure with Nested Routing)
 
-import { Routes, Route } from "react-router-dom";
-import LoginScreen from "./pages/LoginScreen";
-import PrescriptionScreen from "./pages/PrescriptionScreen";
-import EnterpriseScreen from "./pages/EnterpriseScreen";
-import HomeScreen from "./pages/HomeScreen";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import MainLayout from "./layouts/MainLayout"; // 👈 NEW IMPORT (Assuming you created this file/path)
+import { Routes, Route } from 'react-router-dom';
+import LoginScreen from './pages/LoginScreen';
+import PrescriptionScreen from './pages/PrescriptionScreen';
+import EnterpriseScreen from './pages/EnterpriseScreen';
+import HomeScreen from './pages/HomeScreen';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import MainLayout from './layouts/MainLayout'; // 👈 NEW IMPORT (Assuming you created this file/path)
 
 function App() {
   return (
