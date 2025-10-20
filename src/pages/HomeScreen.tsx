@@ -10,8 +10,7 @@ function HomeScreen() {
         Welcome Back!
       </h2>
       <p className="text-lg text-gray-600 dark:text-gray-400">
-        Select "New Prescription" to begin writing, or configure your enterprise
-        details.
+        Select "New Prescription" to begin writing, or configure your enterprise details.
       </p>
     </div>
   );

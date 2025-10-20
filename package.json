@@ -8,17 +8,22 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "prettier:fix": "npx prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "lint:fix": "npx eslint . --ext ts,tsx --fix",
     "format:all": "yarn lint:fix && yarn prettier:fix"
   },
   "lint-staged": {
-   "*.{js,jsx,ts,tsx}": [
-     "eslint --fix", 
-    "prettier --write"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "npx prettier --write"
+    ],
+    "*.{json,css,scss,md}": [
+      "npx prettier --write"
     ]
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
@@ -45,7 +50,7 @@
     "eslint": "^9.38.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
-    "eslint-plugin-react-refresh": "^0.4.22",
+    "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.4.0",
     "postcss": "^8.5.6",
     "tailwindcss": "3.4.18",
