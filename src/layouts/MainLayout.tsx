@@ -1,8 +1,7 @@
 // src/layouts/MainLayout.tsx
 
-import { Link, Outlet } from "react-router-dom";
-import SignOutButton from "@/components/SignOutButton";
-import { ThemeToggle } from "@/components/ThemeToggle"; // 👈 IMPORT THE THEME TOGGLER
+import { Link, Outlet } from "react-router-dom"; // 👈 IMPORT THE THEME TOGGLER
+import Navigation from '../components/navigation/Navigation';
 
 export default function MainLayout() {
   return (
@@ -13,36 +12,7 @@ export default function MainLayout() {
           PrescriptionX Dashboard
         </h1>
 
-        <nav className="flex space-x-6 items-center">
-          {/* Navigation Links */}
-          <Link
-            to="/"
-            className="text-sm font-medium text-gray-600 hover:text-primary dark:text-gray-300"
-          >
-            Home
-          </Link>
-          <Link
-            to="/prescription"
-            className="text-sm font-medium text-gray-600 hover:text-primary dark:text-gray-300"
-          >
-            New Prescription
-          </Link>
-          <Link
-            to="/enterprise"
-            className="text-sm font-medium text-gray-600 hover:text-primary dark:text-gray-300"
-          >
-            Hospital Settings
-          </Link>
-
-          {/* 💥 THEME TOGGLER 💥 */}
-          {/* We use space-x-2 here to create a small gap between the toggler and the sign-out button */}
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-
-            {/* Sign Out Button */}
-            <SignOutButton />
-          </div>
-        </nav>
+        <Navigation />
       </header>
 
       {/* 💥 Outlet renders the current child route content 💥 */}
