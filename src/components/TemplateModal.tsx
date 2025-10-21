@@ -33,7 +33,7 @@ import { PlusCircle, Trash2, Loader2 } from "lucide-react";
 import { addTemplate, updateTemplate } from "@/firebase/templateService";
 // ADDED: Import the TemplateData type from your screen
 // (Adjust path if your screen file is named differently or located elsewhere)
-import { TemplateData, Medication } from "@/interfaces/template";
+import { TemplateData, MedicationData } from "@/interfaces/template";
 
 
 // --- Component Props ---
@@ -55,7 +55,7 @@ export function TemplateModal({
 }: TemplateModalProps) {
     // --- Internal state for this modal ---
     const [templateName, setTemplateName] = useState("");
-    const [medications, setMedications] = useState<Medication[]>([]);
+    const [medications, setMedications] = useState<MedicationData[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -84,13 +84,37 @@ export function TemplateModal({
 
     // --- Handlers ---
     const handleMedicationChange = (
-        id: string, // <-- MODIFIED: Changed from number
-        field: keyof Medication,
+        id: string,
+        field: keyof MedicationData,
         value: string
     ) => {
-        setMedications((currentMeds) =>
-            currentMeds.map((med) => (med.id === id ? { ...med, [field]: value } : med))
-        );
+
+        if (field === "regimen") {
+            // 1. Filter: Allow only '0' and '1'
+            let filteredDigits = value.replace(/[^01]/g, '');
+
+            // 2. Truncate to a max of 3 digits
+            if (filteredDigits.length > 3) {
+                filteredDigits = filteredDigits.substring(0, 3);
+            }
+
+            // 3. Re-join them with hyphens
+            // Example: "1" -> "1"
+            // Example: "11" -> "1-1"
+            // Example: "101" -> "1-0-1"
+            const formatted = filteredDigits.split('').join('-');
+
+            // 4. Set the new formatted value
+            setMedications((currentMeds) =>
+                currentMeds.map((med) => (med.id === id ? { ...med, [field]: formatted } : med))
+            );
+
+        } else {
+            // Default behavior for all other fields
+            setMedications((currentMeds) =>
+                currentMeds.map((med) => (med.id === id ? { ...med, [field]: value } : med))
+            );
+        }
     };
 
     const addMedicationRow = () => {
@@ -125,7 +149,7 @@ export function TemplateModal({
     const handleSaveClick = async () => {
         setError(null);
         // Filter out empty rows and remove the local 'id' field before saving
-        const newMeds: Medication[] = medications.filter((m) => m.name.trim() !== "");
+        const newMeds: MedicationData[] = medications.filter((m) => m.name.trim() !== "");
 
 
         // --- Validation ---

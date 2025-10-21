@@ -22,6 +22,12 @@ export default function Navbar() {
           Home
         </Link>
         <Link
+          to="/templates"
+          className="text-sm font-medium text-gray-600 hover:text-primary dark:text-gray-300"
+        >
+          Templates
+        </Link>
+        <Link
           to="/prescription"
           className="text-sm font-medium text-gray-600 hover:text-primary dark:text-gray-300"
         >
@@ -48,6 +54,9 @@ export default function Navbar() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
               <Link to="/">Home</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/templates">Home</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/prescription">New Prescription</Link>

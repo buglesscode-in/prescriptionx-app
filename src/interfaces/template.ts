@@ -1,4 +1,4 @@
-export type Medication = {
+export type MedicationData = {
     id: string; // Keep this as number for local state key management
     name: string;
     regimen: string;
@@ -12,5 +12,5 @@ export type TemplateData = {
     id?: string
     isDeleted: boolean;
     templateName: string;
-    medications: Medication[];
+    medications: MedicationData[];
 }
