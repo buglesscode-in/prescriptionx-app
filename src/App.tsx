@@ -7,6 +7,7 @@ import EnterpriseScreen from './pages/EnterpriseScreen';
 import HomeScreen from './pages/HomeScreen';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import MainLayout from './layouts/MainLayout'; // 👈 NEW IMPORT (Assuming you created this file/path)
+import TemplateScreen from './pages/TemplateScreen';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
       >
         {/* These routes render inside the <Outlet /> of MainLayout */}
         <Route path="/" element={<HomeScreen />} />
+        <Route path="/templates" element={<TemplateScreen />} />
         <Route path="/prescription" element={<PrescriptionScreen />} />
         <Route path="/enterprise" element={<EnterpriseScreen />} />
       </Route>

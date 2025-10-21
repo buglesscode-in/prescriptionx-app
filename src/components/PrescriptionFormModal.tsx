@@ -34,21 +34,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PlusCircle, Trash2, Loader2, ChevronDown } from "lucide-react";
-import { useAuth } from "@/context/authContextDefinition";
 import { getEnterprisesByUid } from "@/firebase/prescriptionService";
 import { EnterpriseData } from "@/interfaces/enterprise";
-import { getUserTemplates, addTemplate } from "@/firebase/templateService"; // <-- ADDED addTemplate
-import { TemplateData } from "@/interfaces/template";
-import { SaveTemplateNameModal } from "@/components/SaveTemplateNameModal"; // <-- ADDED Import for the new modal
-// --- Local Medication Type ---
-type Medication = {
-  id: string;
-  name: string;
-  regimen: string;
-  mealTime: "Before Meal" | "After Meal" | "With Meal";
-  duration: string;
-  frequency: "Daily" | "Weekly" | "Twice a day" | "As needed";
-  remarks: string;
+import { getUserTemplates, addTemplate } from "@/firebase/templateService";
+import { TemplateData, MedicationData } from "@/interfaces/template";
+import { SaveTemplateNameModal } from "@/components/SaveTemplateNameModal";
+
+type Medication = MedicationData & {
   sourceTemplateId?: string;
 };
 
@@ -60,11 +52,7 @@ interface PrescriptionFormModalProps {
 }
 
 // --- Initial Data ---
-const initialMedications: Medication[] = []; // Start empty is often better
-const initialAdvice =
-  "High protein diet(calorie deficit - low carb), good hydration of minimum 3L/day, work out for atleast 45 mins/day.";
-const initialNotes =
-  "Take all medications strictly as prescribed and consume as exactly instructed by the doctor.";
+const initialMedications: Medication[] = [];
 
 // --- The Modal Component ---
 export function PrescriptionFormModal({
@@ -73,12 +61,13 @@ export function PrescriptionFormModal({
   userUid,
 }: PrescriptionFormModalProps) {
   // --- State ---
-  const { currentUser } = useAuth();
-  const [medications, setMedications] = useState<Medication[]>(initialMedications);
-  const [advice, setAdvice] = useState(initialAdvice);
-  const [notes, setNotes] = useState(initialNotes);
+  const [medications, setMedications] =
+    useState<Medication[]>([]);
+  const [advice, setAdvice] = useState("");
+  const [notes, setNotes] = useState("");
   const [enterpriseList, setEnterpriseList] = useState<EnterpriseData[]>([]);
-  const [selectedEnterprise, setSelectedEnterprise] = useState<EnterpriseData | null>(null);
+  const [selectedEnterprise, setSelectedEnterprise] =
+    useState<EnterpriseData | null>(null);
   const [isLoadingClinics, setIsLoadingClinics] = useState(false);
   const [clinicError, setClinicError] = useState<string | null>(null);
   const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
@@ -86,14 +75,19 @@ export function PrescriptionFormModal({
   const [templateError, setTemplateError] = useState<string | null>(null);
   const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>([]);
 
-  // --- ADDED: State for Save Template Modal ---
+  // --- State for Save Template Modal ---
   const [isSaveTemplateModalOpen, setIsSaveTemplateModalOpen] = useState(false);
-  const [isSavingTemplate, setIsSavingTemplate] = useState(false); // Loading state for template save
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
+  // --- State for Patient Info ---
+  const [patientDetails, setPatientDetails] = useState("");
+  const [patientAge, setPatientAge] = useState("");
+  const [patientWeight, setPatientWeight] = useState("");
+  const [patientHeight, setPatientHeight] = useState("");
+  const [patientBmi, setPatientBmi] = useState("");
 
   // --- Fetch Clinics ---
   const fetchEnterprises = useCallback(() => {
-    // ... (fetchEnterprises function remains the same)
     if (!userUid) return;
     setIsLoadingClinics(true);
     setClinicError(null);
@@ -117,15 +111,21 @@ export function PrescriptionFormModal({
 
   // --- Reset Form on Modal Open / User Change ---
   useEffect(() => {
-    // ... (useEffect logic remains the same)
     if (isOpen && userUid) {
-      setMedications(initialMedications); // Reset meds
-      setAdvice(initialAdvice);
-      setNotes(initialNotes);
-      setSelectedTemplateIds([]); // Reset template selection
-      setIsSaveTemplateModalOpen(false); // Ensure name modal is closed
-      setIsSavingTemplate(false);      // Reset template saving state
-      fetchEnterprises(); // Fetch clinics (will also set default)
+      setMedications(initialMedications);
+      setAdvice("");
+      setNotes("");
+      setSelectedTemplateIds([]);
+
+      setPatientDetails("");
+      setPatientAge("");
+      setPatientWeight("");
+      setPatientHeight("");
+      setPatientBmi("");
+
+      setIsSaveTemplateModalOpen(false);
+      setIsSavingTemplate(false);
+      fetchEnterprises();
 
       // Fetch templates
       setIsTemplateLoading(true);
@@ -141,22 +141,28 @@ export function PrescriptionFormModal({
     } else if (!isOpen) {
       // Optional cleanup when closing
       setMedications([]);
-      setAdvice(initialAdvice);
-      setNotes(initialNotes);
+      setAdvice("");
+      setNotes("");
       setSelectedEnterprise(null);
       setEnterpriseList([]);
       setAllTemplates([]);
       setSelectedTemplateIds([]);
       setClinicError(null);
       setTemplateError(null);
-      setIsSaveTemplateModalOpen(false); // Ensure name modal is closed on outer close
+
+      setPatientDetails("");
+      setPatientAge("");
+      setPatientWeight("");
+      setPatientHeight("");
+      setPatientBmi("");
+
+      setIsSaveTemplateModalOpen(false);
       setIsSavingTemplate(false);
     }
   }, [isOpen, userUid, fetchEnterprises]);
 
   // --- Clinic Change Handler ---
   const handleClinicChange = (clinicId: string) => {
-    // ... (handleClinicChange function remains the same)
     const newSelected = enterpriseList.find(
       (clinic) => clinic.id === clinicId
     );
@@ -164,35 +170,74 @@ export function PrescriptionFormModal({
   };
 
   // --- Medication handlers ---
-  const handleMedicationChange = (id: string, field: keyof Medication, value: string) => {
-    // ... (handleMedicationChange function remains the same)
-    setMedications((currentMeds) =>
-      currentMeds.map((med) => (med.id === id ? { ...med, [field]: value } : med))
-    );
+
+  // --- THIS IS THE MODIFIED FUNCTION ---
+  const handleMedicationChange = (
+    id: string,
+    field: keyof Medication,
+    value: string
+  ) => {
+
+    if (field === "regimen") {
+      // 1. Filter: Allow only '0' and '1'
+      let filteredDigits = value.replace(/[^01]/g, '');
+
+      // 2. Truncate to a max of 3 digits
+      if (filteredDigits.length > 3) {
+        filteredDigits = filteredDigits.substring(0, 3);
+      }
+
+      // 3. Re-join them with hyphens
+      // Example: "1" -> "1"
+      // Example: "11" -> "1-1"
+      // Example: "101" -> "1-0-1"
+      const formatted = filteredDigits.split('').join('-');
+
+      // 4. Set the new formatted value
+      setMedications((currentMeds) =>
+        currentMeds.map((med) => (med.id === id ? { ...med, [field]: formatted } : med))
+      );
+
+    } else {
+      // Default behavior for all other fields
+      setMedications((currentMeds) =>
+        currentMeds.map((med) => (med.id === id ? { ...med, [field]: value } : med))
+      );
+    }
   };
+  // --- END OF MODIFIED FUNCTION ---
+
   const addMedicationRow = () => {
-    // ... (addMedicationRow function remains the same)
     const newId = crypto.randomUUID();
-    setMedications([...medications, { id: newId, name: "", regimen: "", mealTime: "After Meal", duration: "30 Days", frequency: "Daily", remarks: "" }]);
+    setMedications([
+      ...medications,
+      {
+        id: newId,
+        name: "",
+        regimen: "",
+        mealTime: "After Meal",
+        duration: "30 Days",
+        frequency: "Daily",
+        remarks: "",
+      },
+    ]);
   };
   const removeMedicationRow = (id: string) => {
-    // ... (removeMedicationRow function remains the same)
     setMedications((currentMeds) => currentMeds.filter((med) => med.id !== id));
   };
 
   // --- Template Toggle Handler ---
   const handleTemplateToggle = (templateId: string, isChecked: boolean) => {
-    // ... (handleTemplateToggle function remains the same)
-    setTemplateError(null); // Clear errors on interaction
+    setTemplateError(null);
     if (isChecked) {
       const template = allTemplates.find((t) => t.id === templateId);
       if (!template) {
         setTemplateError("Could not find selected template.");
         return;
       }
-      const existingIds = new Set(medications.map(m => m.id));
+      const existingIds = new Set(medications.map((m) => m.id));
       const newMedsFromTemplate = template.medications
-        .filter(med => med.id && !existingIds.has(med.id)) // Skip missing IDs & duplicates
+        .filter((med) => med.id && !existingIds.has(med.id))
         .map((med) => ({
           ...med,
           id: med.id,
@@ -204,9 +249,12 @@ export function PrescriptionFormModal({
           frequency: med.frequency || "Daily",
           remarks: med.remarks || "",
         }));
-      const skippedCount = template.medications.length - newMedsFromTemplate.length;
+      const skippedCount =
+        template.medications.length - newMedsFromTemplate.length;
       if (skippedCount > 0) {
-        console.warn(`Skipped ${skippedCount} medication(s) from template '${template.templateName}' due to missing IDs or duplicates.`);
+        console.warn(
+          `Skipped ${skippedCount} medication(s) from template '${template.templateName}' due to missing IDs or duplicates.`
+        );
       }
       setMedications((currentMeds) => [...currentMeds, ...newMedsFromTemplate]);
       setSelectedTemplateIds((prev) => [...prev, templateId]);
@@ -222,14 +270,26 @@ export function PrescriptionFormModal({
 
   // --- Save Prescription Handler ---
   const handleSavePrescription = () => {
-    // Renamed from handleSaveChanges for clarity
-    // ... (logic remains the same as previous handleSaveChanges)
-    const filledMedications = medications.filter(med => med.name.trim() !== '');
+    // NOTE: You may want to add validation here to ensure regimen.length === 5
+    // e.g., if (med.regimen.length > 0 && med.regimen.length < 5) { ... show error ... }
+
+    const filledMedications = medications.filter(
+      (med) => med.name.trim() !== ""
+    );
     const finalPrescription = {
       userUid: userUid,
       clinicId: selectedEnterprise?.id || null,
       clinicName: selectedEnterprise?.hospitalName || null,
-      medications: filledMedications.map(({ id, sourceTemplateId, ...rest }) => rest), // Strip local fields
+
+      patientDetails: patientDetails,
+      patientAge: patientAge,
+      patientWeight: patientWeight,
+      patientHeight: patientHeight,
+      patientBmi: patientBmi,
+
+      medications: filledMedications.map(
+        ({ id, sourceTemplateId, ...rest }) => rest
+      ),
       advice,
       notes,
       createdAt: new Date().toISOString(),
@@ -244,89 +304,100 @@ export function PrescriptionFormModal({
     onClose(true);
   };
 
-  // --- ADDED: Handlers for Save As Template ---
+  // --- Handlers for Save As Template ---
   const handleOpenSaveTemplateModal = () => {
-    const filledMedications = medications.filter(med => med.name.trim() !== '');
+    const filledMedications = medications.filter(
+      (med) => med.name.trim() !== ""
+    );
     if (filledMedications.length === 0) {
-      // Optionally show an error that you can't save an empty template
       setTemplateError("Cannot save an empty medication list as a template.");
       return;
     }
-    setTemplateError(null); // Clear previous errors
+    setTemplateError(null);
     setIsSaveTemplateModalOpen(true);
   };
 
   const handleSaveAsTemplate = async (templateName: string) => {
-    // This function is passed to SaveTemplateNameModal
-    const filledMedications = medications.filter(med => med.name.trim() !== '');
+    const filledMedications = medications.filter(
+      (med) => med.name.trim() !== ""
+    );
 
     if (filledMedications.length === 0) {
-      // This check is slightly redundant due to the check in handleOpenSaveTemplateModal, but good for safety
-      throw new Error("Cannot save an empty medication list."); // Throw error to be caught by name modal
+      throw new Error("Cannot save an empty medication list.");
     }
 
-    const templateMeds = filledMedications.map(({ sourceTemplateId, ...rest }) => rest); // Strip local fields
+    const templateMeds = filledMedications.map(
+      ({ sourceTemplateId, ...rest }) => rest
+    );
 
     setIsSavingTemplate(true);
     try {
       await addTemplate({
         templateName: templateName,
         medications: templateMeds,
-        userUid: userUid, // Make sure userUid is correct
+        userUid: userUid,
       });
       console.log("Template saved successfully:", templateName);
-      setIsSaveTemplateModalOpen(false); // Close name modal on success
-
-      // Optionally show a success toast/message here
+      setIsSaveTemplateModalOpen(false);
     } catch (error: any) {
       console.error("Failed to save template:", error);
-      // Rethrow the error so it's displayed in the SaveTemplateNameModal
-      throw new Error(error.message || "An unknown error occurred while saving the template.");
+      throw new Error(
+        error.message ||
+        "An unknown error occurred while saving the template."
+      );
     } finally {
       setIsSavingTemplate(false);
     }
   };
-  // --- END ADDED Handlers ---
+  // --- END Handlers ---
 
   const selectedTemplateCount = selectedTemplateIds.length;
 
   return (
-    <> {/* Use Fragment to render multiple top-level elements */}
+    <>
       <Dialog open={isOpen} onOpenChange={() => onClose()}>
         <DialogContent className="sm:max-w-[1000px] max-h-[90vh] overflow-y-auto p-8">
-          {/* === HEADER (Previous Style) === */}
-          {/* ... (Header JSX remains the same) ... */}
+          {/* === HEADER === */}
           <div className="flex justify-between items-start">
-            <div className="flex items-center gap-4">
+            <div className="flex items-end gap-4">
               <h1 className="text-3xl font-bold">Medical Prescription</h1>
-              <Select
-                value={selectedEnterprise?.id || ""}
-                onValueChange={handleClinicChange}
-                disabled={isLoadingClinics || enterpriseList.length === 0}
-              >
-                <SelectTrigger className="w-[250px]">
-                  {isLoadingClinics ? (
-                    <span className="flex items-center text-muted-foreground">
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Loading Clinics...
-                    </span>
-                  ) : (
-                    <SelectValue placeholder="Select a Clinic *" />
-                  )}
-                </SelectTrigger>
-                <SelectContent>
-                  {enterpriseList.length === 0 && !isLoadingClinics ? (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">No clinics found.</div>
-                  ) : (
-                    enterpriseList.map((clinic) => (
-                      <SelectItem key={clinic.id} value={clinic.id}>
-                        {clinic.hospitalName}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              {clinicError && <p className="text-sm text-red-500">{clinicError}</p>}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-muted-foreground">
+                  Select Enterprise
+                </label>
+                <Select
+                  value={selectedEnterprise?.id || ""}
+                  onValueChange={handleClinicChange}
+                  disabled={isLoadingClinics || enterpriseList.length === 0}
+                >
+                  <SelectTrigger className="w-[250px]">
+                    {isLoadingClinics ? (
+                      <span className="flex items-center text-muted-foreground">
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Loading Clinics...
+                      </span>
+                    ) : (
+                      <SelectValue placeholder="Select a Clinic *" />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {enterpriseList.length === 0 && !isLoadingClinics ? (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                        No clinics found.
+                      </div>
+                    ) : (
+                      enterpriseList.map((clinic) => (
+                        <SelectItem key={clinic.id} value={clinic.id}>
+                          {clinic.hospitalName}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                {clinicError && (
+                  <p className="text-sm text-red-500">{clinicError}</p>
+                )}
+              </div>
             </div>
             <div className="text-right text-xs text-muted-foreground min-w-[200px]">
               {selectedEnterprise ? (
@@ -337,30 +408,60 @@ export function PrescriptionFormModal({
                   <p>License no: {selectedEnterprise.licenseNumber}</p>
                 </>
               ) : !isLoadingClinics ? (
-                enterpriseList.length > 0 ? <p>Select Clinic</p> : <p>No clinics available.</p>
+                enterpriseList.length > 0 ? (
+                  <p>Select Clinic</p>
+                ) : (
+                  <p>No clinics available.</p>
+                )
               ) : null}
             </div>
           </div>
           <Separator className="my-4" />
 
-          {/* === PATIENT INFO (Previous 5-Col Style) === */}
-          {/* ... (Patient Info JSX remains the same) ... */}
-          <div className="grid grid-cols-5 gap-x-4 gap-y-1 text-sm">
+          {/* === PATIENT INFO (MODIFIED for 6-Col & Age) === */}
+          <div className="grid grid-cols-6 gap-x-4 gap-y-1 text-sm items-center">
             <div className="font-semibold">Patient</div>
+            <div className="font-semibold">Age</div>
             <div className="font-semibold">Weight</div>
             <div className="font-semibold">Height</div>
             <div className="font-semibold">BMI</div>
             <div className="font-semibold">Date</div>
-            <div>Salman (M, None yrs)</div>
-            <div><span className="italic text-muted-foreground">[Redacted] Kg</span></div>
-            <div><span className="italic text-muted-foreground">[Redacted] m</span></div>
-            <div><span className="italic text-muted-foreground">[Redacted]</span></div>
-            <div>{new Date().toLocaleDateString('en-IN')}</div>
+            {/* --- Editable Fields --- */}
+            <Input
+              value={patientDetails}
+              onChange={(e) => setPatientDetails(e.target.value)}
+              placeholder="Name"
+              className="text-sm h-9"
+            />
+            <Input
+              value={patientAge}
+              onChange={(e) => setPatientAge(e.target.value)}
+              placeholder="e.g., 30 yrs"
+              className="text-sm h-9"
+            />
+            <Input
+              value={patientWeight}
+              onChange={(e) => setPatientWeight(e.target.value)}
+              placeholder="e.g., 75 Kg"
+              className="text-sm h-9"
+            />
+            <Input
+              value={patientHeight}
+              onChange={(e) => setPatientHeight(e.target.value)}
+              placeholder="e.g., 1.8 m"
+              className="text-sm h-9"
+            />
+            <Input
+              value={patientBmi}
+              onChange={(e) => setPatientBmi(e.target.value)}
+              placeholder="e.g., 23.1"
+              className="text-sm h-9"
+            />
+            <div>{new Date().toLocaleDateString("en-IN")}</div>
           </div>
           <Separator className="my-4" />
 
           {/* === PATIENT HISTORY / DIAGNOSIS (Placeholders) === */}
-          {/* ... (History/Diagnosis JSX remains the same) ... */}
           <div className="space-y-1">
             <h4 className="font-semibold text-red-600">Patient History</h4>
             <p className="text-sm italic text-muted-foreground">
@@ -377,7 +478,6 @@ export function PrescriptionFormModal({
           <Separator className="my-4" />
 
           {/* === Rx SECTION === */}
-          {/* ... (Rx Section JSX remains largely the same, including the multi-select dropdown) ... */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-semibold">Rx</h3>
@@ -391,11 +491,14 @@ export function PrescriptionFormModal({
                     >
                       {isTemplateLoading ? (
                         <span className="flex items-center text-muted-foreground">
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Loading...
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />{" "}
+                          Loading...
                         </span>
                       ) : (
                         <span className="truncate">
-                          {selectedTemplateCount === 0 ? "Load from Template" : `${selectedTemplateCount} Template(s) Selected`}
+                          {selectedTemplateCount === 0
+                            ? "Load from Template"
+                            : `${selectedTemplateCount} Template(s) Selected`}
                         </span>
                       )}
                       <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
@@ -409,7 +512,9 @@ export function PrescriptionFormModal({
                         <DropdownMenuCheckboxItem
                           key={template.id}
                           checked={selectedTemplateIds.includes(template.id)}
-                          onCheckedChange={(checked) => handleTemplateToggle(template.id, !!checked)}
+                          onCheckedChange={(checked) =>
+                            handleTemplateToggle(template.id, !!checked)
+                          }
                           onSelect={(e) => e.preventDefault()}
                         >
                           {template.templateName}
@@ -422,18 +527,29 @@ export function PrescriptionFormModal({
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button variant="outline" size="sm" onClick={addMedicationRow} className="flex-shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addMedicationRow}
+                  className="flex-shrink-0"
+                >
                   <PlusCircle className="h-4 w-4 mr-2" /> Add Medicine
                 </Button>
               </div>
             </div>
-            {templateError && <p className="text-sm text-red-500 text-right mt-1">{templateError}</p>}
+            {templateError && (
+              <p className="text-sm text-red-500 text-right mt-1">
+                {templateError}
+              </p>
+            )}
             <div className="border rounded-md overflow-x-auto">
               <Table className="min-w-[900px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]">#</TableHead>
-                    <TableHead className="min-w-[200px]">Medicine Name</TableHead>
+                    <TableHead className="min-w-[200px]">
+                      Medicine Name
+                    </TableHead>
                     <TableHead>Regimen</TableHead>
                     <TableHead>Meal Time</TableHead>
                     <TableHead>Duration</TableHead>
@@ -445,39 +561,123 @@ export function PrescriptionFormModal({
                 <TableBody>
                   {medications.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">No medications added.</TableCell>
+                      <TableCell
+                        colSpan={8}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        No medications added.
+                      </TableCell>
                     </TableRow>
                   ) : (
                     medications.map((med, index) => (
                       <TableRow key={med.id}>
-                        <TableCell className="text-center">{index + 1}</TableCell>
-                        <TableCell><Input value={med.name} placeholder="Medicine Name" onChange={(e) => handleMedicationChange(med.id, "name", e.target.value)} /></TableCell>
-                        <TableCell><Input value={med.regimen} placeholder="e.g., 1-0-1" onChange={(e) => handleMedicationChange(med.id, "regimen", e.target.value)} /></TableCell>
+                        <TableCell className="text-center">
+                          {index + 1}
+                        </TableCell>
                         <TableCell>
-                          <Select value={med.mealTime} onValueChange={(v: any) => handleMedicationChange(med.id, "mealTime", v)}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
+                          <Input
+                            value={med.name}
+                            placeholder="Medicine Name"
+                            onChange={(e) =>
+                              handleMedicationChange(
+                                med.id,
+                                "name",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            value={med.regimen}
+                            placeholder="e.g., 1-0-1"
+                            onChange={(e) =>
+                              handleMedicationChange(
+                                med.id,
+                                "regimen",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={med.mealTime}
+                            onValueChange={(v: any) =>
+                              handleMedicationChange(med.id, "mealTime", v)
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="After Meal">After Meal</SelectItem>
-                              <SelectItem value="Before Meal">Before Meal</SelectItem>
-                              <SelectItem value="With Meal">With Meal</SelectItem>
+                              <SelectItem value="After Meal">
+                                After Meal
+                              </SelectItem>
+                              <SelectItem value="Before Meal">
+                                Before Meal
+                              </SelectItem>
+                              <SelectItem value="With Meal">
+                                With Meal
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
-                        <TableCell><Input value={med.duration} placeholder="e.g., 30 Days" onChange={(e) => handleMedicationChange(med.id, "duration", e.target.value)} /></TableCell>
                         <TableCell>
-                          <Select value={med.frequency} onValueChange={(v: any) => handleMedicationChange(med.id, "frequency", v)}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
+                          <Input
+                            value={med.duration}
+                            placeholder="e.g., 30 Days"
+                            onChange={(e) =>
+                              handleMedicationChange(
+                                med.id,
+                                "duration",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={med.frequency}
+                            onValueChange={(v: any) =>
+                              handleMedicationChange(med.id, "frequency", v)
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Daily">Daily</SelectItem>
                               <SelectItem value="Weekly">Weekly</SelectItem>
-                              <SelectItem value="Twice a day">Twice a day</SelectItem>
-                              <SelectItem value="As needed">As needed</SelectItem>
+                              <SelectItem value="Twice a day">
+                                Twice a day
+                              </SelectItem>
+                              <SelectItem value="As needed">
+                                As needed
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
-                        <TableCell><Input value={med.remarks} placeholder="Optional" onChange={(e) => handleMedicationChange(med.id, "remarks", e.target.value)} /></TableCell>
+                        <TableCell>
+                          <Input
+                            value={med.remarks}
+                            placeholder="Optional"
+                            onChange={(e) =>
+                              handleMedicationChange(
+                                med.id,
+                                "remarks",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" onClick={() => removeMedicationRow(med.id)} className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeMedicationRow(med.id)}
+                            className="h-8 w-8"
+                          >
                             <Trash2 className="h-4 w-4 text-red-500" />
                           </Button>
                         </TableCell>
@@ -489,17 +689,25 @@ export function PrescriptionFormModal({
             </div>
           </div>
 
-
           {/* === ADVICE & NOTES === */}
-          {/* ... (Advice & Notes JSX remains the same) ... */}
           <div className="space-y-4 mt-6">
             <div className="space-y-1">
               <h4 className="font-semibold">Advice</h4>
-              <Textarea value={advice} onChange={(e) => setAdvice(e.target.value)} rows={3} placeholder="Enter advice..." />
+              <Textarea
+                value={advice}
+                onChange={(e) => setAdvice(e.target.value)}
+                rows={3}
+                placeholder="Enter advice..."
+              />
             </div>
             <div className="space-y-1">
               <h4 className="font-semibold">Notes</h4>
-              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Enter notes..." />
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+                placeholder="Enter notes..."
+              />
             </div>
           </div>
 
@@ -508,33 +716,34 @@ export function PrescriptionFormModal({
             <Button type="button" variant="secondary" onClick={() => onClose()}>
               Cancel
             </Button>
-            {/* --- MODIFIED: Save As Template Button --- */}
             <Button
               type="button"
-              variant="outline" // Changed variant
+              variant="outline"
               onClick={handleOpenSaveTemplateModal}
-              disabled={medications.filter(med => med.name.trim() !== '').length === 0 || isSavingTemplate} // Disable if no meds or saving
+              disabled={
+                medications.filter((med) => med.name.trim() !== "").length ===
+                0 || isSavingTemplate
+              }
             >
               Save As Template
             </Button>
             <Button
               type="button"
-              onClick={handleSavePrescription} // Changed handler name
-              // Optionally disable print/save prescription if saving template
-              disabled={true}
+              onClick={handleSavePrescription}
+              disabled={true} // Still disabled as per original code
             >
-              Print {/* Assuming this button saves and triggers print */}
+              Print
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* --- ADDED: Render the SaveTemplateNameModal --- */}
+      {/* --- Render the SaveTemplateNameModal --- */}
       <SaveTemplateNameModal
         isOpen={isSaveTemplateModalOpen}
         onClose={() => setIsSaveTemplateModalOpen(false)}
         onSave={handleSaveAsTemplate}
-        isLoading={isSavingTemplate} // Pass loading state down
+        isLoading={isSavingTemplate}
       />
     </>
   );
