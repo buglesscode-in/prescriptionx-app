@@ -65,13 +65,6 @@ export default function PrescriptionScreen() {
         </div>
       )}
 
-      {/* Form Modal */}
-      {/* <EnterpriseFormModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        initialData={editingEnterprise}
-        userUid={currentUser?.uid || ''}
-      /> */}
       <PrescriptionFormModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
