@@ -1,17 +1,17 @@
-import {
-    Timestamp,
-} from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 export interface EnterpriseData {
-    id?: string;
-    hospitalName: string;
-    address: string;
-    doctorName: string;
-    licenseNumber: string;
-    createdByUid: string;
-    logoUrl?: string;
+  id?: string;
+  hospitalName: string;
+  address: string;
+  doctorName: string;
+  licenseNumber: string;
+  createdByUid: string;
+  logoUrl?: string;
+  phoneNumber?: string;
+  specialization?: string;
 
-    // Soft Delete Fields
-    isDeleted?: boolean;
-    deletedAt?: Timestamp | null;
+  // Soft Delete Fields
+  isDeleted?: boolean;
+  deletedAt?: Timestamp | null;
 }

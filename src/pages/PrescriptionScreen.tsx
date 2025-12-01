@@ -70,7 +70,6 @@ export default function PrescriptionScreen() {
         onClose={handleModalClose}
         userUid={currentUser?.uid || ''}
       />
-
     </div>
   );
 }
