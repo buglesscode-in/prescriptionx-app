@@ -1,11 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { useState, useEffect, useCallback } from 'react';
+import { pdf } from '@react-pdf/renderer';
+import { PrescriptionPDF } from './PrescriptionPDF';
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -13,14 +11,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -28,17 +26,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { PlusCircle, Trash2, Loader2, ChevronDown } from "lucide-react";
-import { getEnterprisesByUid } from "@/firebase/prescriptionService";
-import { EnterpriseData } from "@/interfaces/enterprise";
-import { getUserTemplates, addTemplate } from "@/firebase/templateService";
-import { TemplateData, MedicationData } from "@/interfaces/template";
-import { SaveTemplateNameModal } from "@/components/SaveTemplateNameModal";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { PlusCircle, Trash2, Loader2, ChevronDown } from 'lucide-react';
+import { getEnterprisesByUid } from '@/firebase/prescriptionService';
+import { EnterpriseData } from '@/interfaces/enterprise';
+import { getUserTemplates, addTemplate } from '@/firebase/templateService';
+import { TemplateData, MedicationData } from '@/interfaces/template';
+import { SaveTemplateNameModal } from '@/components/SaveTemplateNameModal';
 
 type Medication = MedicationData & {
   sourceTemplateId?: string;
@@ -55,19 +53,13 @@ interface PrescriptionFormModalProps {
 const initialMedications: Medication[] = [];
 
 // --- The Modal Component ---
-export function PrescriptionFormModal({
-  isOpen,
-  onClose,
-  userUid,
-}: PrescriptionFormModalProps) {
+export function PrescriptionFormModal({ isOpen, onClose, userUid }: PrescriptionFormModalProps) {
   // --- State ---
-  const [medications, setMedications] =
-    useState<Medication[]>([]);
-  const [advice, setAdvice] = useState("");
-  const [notes, setNotes] = useState("");
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [advice, setAdvice] = useState('');
+  const [notes, setNotes] = useState('');
   const [enterpriseList, setEnterpriseList] = useState<EnterpriseData[]>([]);
-  const [selectedEnterprise, setSelectedEnterprise] =
-    useState<EnterpriseData | null>(null);
+  const [selectedEnterprise, setSelectedEnterprise] = useState<EnterpriseData | null>(null);
   const [isLoadingClinics, setIsLoadingClinics] = useState(false);
   const [clinicError, setClinicError] = useState<string | null>(null);
   const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
@@ -80,11 +72,11 @@ export function PrescriptionFormModal({
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
   // --- State for Patient Info ---
-  const [patientDetails, setPatientDetails] = useState("");
-  const [patientAge, setPatientAge] = useState("");
-  const [patientWeight, setPatientWeight] = useState("");
-  const [patientHeight, setPatientHeight] = useState("");
-  const [patientBmi, setPatientBmi] = useState("");
+  const [patientDetails, setPatientDetails] = useState('');
+  const [patientAge, setPatientAge] = useState('');
+  const [patientWeight, setPatientWeight] = useState('');
+  const [patientHeight, setPatientHeight] = useState('');
+  const [patientBmi, setPatientBmi] = useState('');
 
   // --- Fetch Clinics ---
   const fetchEnterprises = useCallback(() => {
@@ -101,8 +93,8 @@ export function PrescriptionFormModal({
         }
       })
       .catch((err) => {
-        console.error("Error fetching clinics:", err);
-        setClinicError(err.message || "Failed to load clinics.");
+        console.error('Error fetching clinics:', err);
+        setClinicError(err.message || 'Failed to load clinics.');
         setEnterpriseList([]);
         setSelectedEnterprise(null);
       })
@@ -113,15 +105,15 @@ export function PrescriptionFormModal({
   useEffect(() => {
     if (isOpen && userUid) {
       setMedications(initialMedications);
-      setAdvice("");
-      setNotes("");
+      setAdvice('');
+      setNotes('');
       setSelectedTemplateIds([]);
 
-      setPatientDetails("");
-      setPatientAge("");
-      setPatientWeight("");
-      setPatientHeight("");
-      setPatientBmi("");
+      setPatientDetails('');
+      setPatientAge('');
+      setPatientWeight('');
+      setPatientHeight('');
+      setPatientBmi('');
 
       setIsSaveTemplateModalOpen(false);
       setIsSavingTemplate(false);
@@ -133,16 +125,16 @@ export function PrescriptionFormModal({
       getUserTemplates(userUid)
         .then(setAllTemplates)
         .catch((err) => {
-          console.error("Error fetching templates:", err);
-          setTemplateError(err.message || "Failed to load templates.");
+          console.error('Error fetching templates:', err);
+          setTemplateError(err.message || 'Failed to load templates.');
           setAllTemplates([]);
         })
         .finally(() => setIsTemplateLoading(false));
     } else if (!isOpen) {
       // Optional cleanup when closing
       setMedications([]);
-      setAdvice("");
-      setNotes("");
+      setAdvice('');
+      setNotes('');
       setSelectedEnterprise(null);
       setEnterpriseList([]);
       setAllTemplates([]);
@@ -150,11 +142,11 @@ export function PrescriptionFormModal({
       setClinicError(null);
       setTemplateError(null);
 
-      setPatientDetails("");
-      setPatientAge("");
-      setPatientWeight("");
-      setPatientHeight("");
-      setPatientBmi("");
+      setPatientDetails('');
+      setPatientAge('');
+      setPatientWeight('');
+      setPatientHeight('');
+      setPatientBmi('');
 
       setIsSaveTemplateModalOpen(false);
       setIsSavingTemplate(false);
@@ -163,22 +155,15 @@ export function PrescriptionFormModal({
 
   // --- Clinic Change Handler ---
   const handleClinicChange = (clinicId: string) => {
-    const newSelected = enterpriseList.find(
-      (clinic) => clinic.id === clinicId
-    );
+    const newSelected = enterpriseList.find((clinic) => clinic.id === clinicId);
     setSelectedEnterprise(newSelected || null);
   };
 
   // --- Medication handlers ---
 
   // --- THIS IS THE MODIFIED FUNCTION ---
-  const handleMedicationChange = (
-    id: string,
-    field: keyof Medication,
-    value: string
-  ) => {
-
-    if (field === "regimen") {
+  const handleMedicationChange = (id: string, field: keyof Medication, value: string) => {
+    if (field === 'regimen') {
       // 1. Filter: Allow only '0' and '1'
       let filteredDigits = value.replace(/[^01]/g, '');
 
@@ -197,7 +182,6 @@ export function PrescriptionFormModal({
       setMedications((currentMeds) =>
         currentMeds.map((med) => (med.id === id ? { ...med, [field]: formatted } : med))
       );
-
     } else {
       // Default behavior for all other fields
       setMedications((currentMeds) =>
@@ -213,12 +197,12 @@ export function PrescriptionFormModal({
       ...medications,
       {
         id: newId,
-        name: "",
-        regimen: "",
-        mealTime: "After Meal",
-        duration: "30 Days",
-        frequency: "Daily",
-        remarks: "",
+        name: '',
+        regimen: '',
+        mealTime: 'After Meal',
+        duration: '30 Days',
+        frequency: 'Daily',
+        remarks: '',
       },
     ]);
   };
@@ -232,7 +216,7 @@ export function PrescriptionFormModal({
     if (isChecked) {
       const template = allTemplates.find((t) => t.id === templateId);
       if (!template) {
-        setTemplateError("Could not find selected template.");
+        setTemplateError('Could not find selected template.');
         return;
       }
       const existingIds = new Set(medications.map((m) => m.id));
@@ -242,15 +226,14 @@ export function PrescriptionFormModal({
           ...med,
           id: med.id,
           sourceTemplateId: templateId,
-          name: med.name || "",
-          regimen: med.regimen || "",
-          mealTime: med.mealTime || "After Meal",
-          duration: med.duration || "",
-          frequency: med.frequency || "Daily",
-          remarks: med.remarks || "",
+          name: med.name || '',
+          regimen: med.regimen || '',
+          mealTime: med.mealTime || 'After Meal',
+          duration: med.duration || '',
+          frequency: med.frequency || 'Daily',
+          remarks: med.remarks || '',
         }));
-      const skippedCount =
-        template.medications.length - newMedsFromTemplate.length;
+      const skippedCount = template.medications.length - newMedsFromTemplate.length;
       if (skippedCount > 0) {
         console.warn(
           `Skipped ${skippedCount} medication(s) from template '${template.templateName}' due to missing IDs or duplicates.`
@@ -262,9 +245,7 @@ export function PrescriptionFormModal({
       setMedications((currentMeds) =>
         currentMeds.filter((med) => med.sourceTemplateId !== templateId)
       );
-      setSelectedTemplateIds((prev) =>
-        prev.filter((id) => id !== templateId)
-      );
+      setSelectedTemplateIds((prev) => prev.filter((id) => id !== templateId));
     }
   };
 
@@ -273,9 +254,7 @@ export function PrescriptionFormModal({
     // NOTE: You may want to add validation here to ensure regimen.length === 5
     // e.g., if (med.regimen.length > 0 && med.regimen.length < 5) { ... show error ... }
 
-    const filledMedications = medications.filter(
-      (med) => med.name.trim() !== ""
-    );
+    const filledMedications = medications.filter((med) => med.name.trim() !== '');
     const finalPrescription = {
       userUid: userUid,
       clinicId: selectedEnterprise?.id || null,
@@ -287,30 +266,26 @@ export function PrescriptionFormModal({
       patientHeight: patientHeight,
       patientBmi: patientBmi,
 
-      medications: filledMedications.map(
-        ({ id, sourceTemplateId, ...rest }) => rest
-      ),
+      medications: filledMedications.map(({ id, sourceTemplateId, ...rest }) => rest),
       advice,
       notes,
       createdAt: new Date().toISOString(),
     };
 
     if (!finalPrescription.clinicId) {
-      setClinicError("Please select a clinic.");
+      setClinicError('Please select a clinic.');
       return;
     }
-    console.log("Saving Prescription:", finalPrescription);
+    console.log('Saving Prescription:', finalPrescription);
     // TODO: Add actual Firebase save logic here
     onClose(true);
   };
 
   // --- Handlers for Save As Template ---
   const handleOpenSaveTemplateModal = () => {
-    const filledMedications = medications.filter(
-      (med) => med.name.trim() !== ""
-    );
+    const filledMedications = medications.filter((med) => med.name.trim() !== '');
     if (filledMedications.length === 0) {
-      setTemplateError("Cannot save an empty medication list as a template.");
+      setTemplateError('Cannot save an empty medication list as a template.');
       return;
     }
     setTemplateError(null);
@@ -318,17 +293,13 @@ export function PrescriptionFormModal({
   };
 
   const handleSaveAsTemplate = async (templateName: string) => {
-    const filledMedications = medications.filter(
-      (med) => med.name.trim() !== ""
-    );
+    const filledMedications = medications.filter((med) => med.name.trim() !== '');
 
     if (filledMedications.length === 0) {
-      throw new Error("Cannot save an empty medication list.");
+      throw new Error('Cannot save an empty medication list.');
     }
 
-    const templateMeds = filledMedications.map(
-      ({ sourceTemplateId, ...rest }) => rest
-    );
+    const templateMeds = filledMedications.map(({ sourceTemplateId, ...rest }) => rest);
 
     setIsSavingTemplate(true);
     try {
@@ -337,14 +308,11 @@ export function PrescriptionFormModal({
         medications: templateMeds,
         userUid: userUid,
       });
-      console.log("Template saved successfully:", templateName);
+      console.log('Template saved successfully:', templateName);
       setIsSaveTemplateModalOpen(false);
     } catch (error: any) {
-      console.error("Failed to save template:", error);
-      throw new Error(
-        error.message ||
-        "An unknown error occurred while saving the template."
-      );
+      console.error('Failed to save template:', error);
+      throw new Error(error.message || 'An unknown error occurred while saving the template.');
     } finally {
       setIsSavingTemplate(false);
     }
@@ -352,6 +320,27 @@ export function PrescriptionFormModal({
   // --- END Handlers ---
 
   const selectedTemplateCount = selectedTemplateIds.length;
+
+  const handlePrint = async () => {
+    const filledMedications = medications.filter((med) => med.name.trim() !== '');
+
+    const blob = await pdf(
+      <PrescriptionPDF
+        clinic={selectedEnterprise}
+        patientDetails={patientDetails}
+        patientAge={patientAge}
+        patientWeight={patientWeight}
+        patientHeight={patientHeight}
+        patientBmi={patientBmi}
+        medications={filledMedications}
+        advice={advice}
+        notes={notes}
+        date={new Date().toLocaleDateString('en-IN')}
+      />
+    ).toBlob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  };
 
   return (
     <>
@@ -366,7 +355,7 @@ export function PrescriptionFormModal({
                   Select Enterprise
                 </label>
                 <Select
-                  value={selectedEnterprise?.id || ""}
+                  value={selectedEnterprise?.id || ''}
                   onValueChange={handleClinicChange}
                   disabled={isLoadingClinics || enterpriseList.length === 0}
                 >
@@ -394,17 +383,13 @@ export function PrescriptionFormModal({
                     )}
                   </SelectContent>
                 </Select>
-                {clinicError && (
-                  <p className="text-sm text-red-500">{clinicError}</p>
-                )}
+                {clinicError && <p className="text-sm text-red-500">{clinicError}</p>}
               </div>
             </div>
             <div className="text-right text-xs text-muted-foreground min-w-[200px]">
               {selectedEnterprise ? (
                 <>
-                  <p className="font-bold text-base text-black">
-                    {selectedEnterprise.doctorName}
-                  </p>
+                  <p className="font-bold text-base text-black">{selectedEnterprise.doctorName}</p>
                   <p>License no: {selectedEnterprise.licenseNumber}</p>
                 </>
               ) : !isLoadingClinics ? (
@@ -457,7 +442,7 @@ export function PrescriptionFormModal({
               placeholder="e.g., 23.1"
               className="text-sm h-9"
             />
-            <div>{new Date().toLocaleDateString("en-IN")}</div>
+            <div>{new Date().toLocaleDateString('en-IN')}</div>
           </div>
           <Separator className="my-4" />
 
@@ -471,9 +456,7 @@ export function PrescriptionFormModal({
           <Separator className="my-4" />
           <div className="space-y-1">
             <h4 className="font-semibold text-red-600">Diagnosis</h4>
-            <p className="text-sm italic text-muted-foreground">
-              [Diagnosis details redacted]
-            </p>
+            <p className="text-sm italic text-muted-foreground">[Diagnosis details redacted]</p>
           </div>
           <Separator className="my-4" />
 
@@ -491,13 +474,12 @@ export function PrescriptionFormModal({
                     >
                       {isTemplateLoading ? (
                         <span className="flex items-center text-muted-foreground">
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />{" "}
-                          Loading...
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Loading...
                         </span>
                       ) : (
                         <span className="truncate">
                           {selectedTemplateCount === 0
-                            ? "Load from Template"
+                            ? 'Load from Template'
                             : `${selectedTemplateCount} Template(s) Selected`}
                         </span>
                       )}
@@ -538,18 +520,14 @@ export function PrescriptionFormModal({
               </div>
             </div>
             {templateError && (
-              <p className="text-sm text-red-500 text-right mt-1">
-                {templateError}
-              </p>
+              <p className="text-sm text-red-500 text-right mt-1">{templateError}</p>
             )}
             <div className="border rounded-md overflow-x-auto">
               <Table className="min-w-[900px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]">#</TableHead>
-                    <TableHead className="min-w-[200px]">
-                      Medicine Name
-                    </TableHead>
+                    <TableHead className="min-w-[200px]">Medicine Name</TableHead>
                     <TableHead>Regimen</TableHead>
                     <TableHead>Meal Time</TableHead>
                     <TableHead>Duration</TableHead>
@@ -561,30 +539,19 @@ export function PrescriptionFormModal({
                 <TableBody>
                   {medications.length === 0 ? (
                     <TableRow>
-                      <TableCell
-                        colSpan={8}
-                        className="h-24 text-center text-muted-foreground"
-                      >
+                      <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                         No medications added.
                       </TableCell>
                     </TableRow>
                   ) : (
                     medications.map((med, index) => (
                       <TableRow key={med.id}>
-                        <TableCell className="text-center">
-                          {index + 1}
-                        </TableCell>
+                        <TableCell className="text-center">{index + 1}</TableCell>
                         <TableCell>
                           <Input
                             value={med.name}
                             placeholder="Medicine Name"
-                            onChange={(e) =>
-                              handleMedicationChange(
-                                med.id,
-                                "name",
-                                e.target.value
-                              )
-                            }
+                            onChange={(e) => handleMedicationChange(med.id, 'name', e.target.value)}
                           />
                         </TableCell>
                         <TableCell>
@@ -592,11 +559,7 @@ export function PrescriptionFormModal({
                             value={med.regimen}
                             placeholder="e.g., 1-0-1"
                             onChange={(e) =>
-                              handleMedicationChange(
-                                med.id,
-                                "regimen",
-                                e.target.value
-                              )
+                              handleMedicationChange(med.id, 'regimen', e.target.value)
                             }
                           />
                         </TableCell>
@@ -604,22 +567,16 @@ export function PrescriptionFormModal({
                           <Select
                             value={med.mealTime}
                             onValueChange={(v: any) =>
-                              handleMedicationChange(med.id, "mealTime", v)
+                              handleMedicationChange(med.id, 'mealTime', v)
                             }
                           >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="After Meal">
-                                After Meal
-                              </SelectItem>
-                              <SelectItem value="Before Meal">
-                                Before Meal
-                              </SelectItem>
-                              <SelectItem value="With Meal">
-                                With Meal
-                              </SelectItem>
+                              <SelectItem value="After Meal">After Meal</SelectItem>
+                              <SelectItem value="Before Meal">Before Meal</SelectItem>
+                              <SelectItem value="With Meal">With Meal</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -628,11 +585,7 @@ export function PrescriptionFormModal({
                             value={med.duration}
                             placeholder="e.g., 30 Days"
                             onChange={(e) =>
-                              handleMedicationChange(
-                                med.id,
-                                "duration",
-                                e.target.value
-                              )
+                              handleMedicationChange(med.id, 'duration', e.target.value)
                             }
                           />
                         </TableCell>
@@ -640,7 +593,7 @@ export function PrescriptionFormModal({
                           <Select
                             value={med.frequency}
                             onValueChange={(v: any) =>
-                              handleMedicationChange(med.id, "frequency", v)
+                              handleMedicationChange(med.id, 'frequency', v)
                             }
                           >
                             <SelectTrigger>
@@ -649,12 +602,8 @@ export function PrescriptionFormModal({
                             <SelectContent>
                               <SelectItem value="Daily">Daily</SelectItem>
                               <SelectItem value="Weekly">Weekly</SelectItem>
-                              <SelectItem value="Twice a day">
-                                Twice a day
-                              </SelectItem>
-                              <SelectItem value="As needed">
-                                As needed
-                              </SelectItem>
+                              <SelectItem value="Twice a day">Twice a day</SelectItem>
+                              <SelectItem value="As needed">As needed</SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -663,11 +612,7 @@ export function PrescriptionFormModal({
                             value={med.remarks}
                             placeholder="Optional"
                             onChange={(e) =>
-                              handleMedicationChange(
-                                med.id,
-                                "remarks",
-                                e.target.value
-                              )
+                              handleMedicationChange(med.id, 'remarks', e.target.value)
                             }
                           />
                         </TableCell>
@@ -721,17 +666,12 @@ export function PrescriptionFormModal({
               variant="outline"
               onClick={handleOpenSaveTemplateModal}
               disabled={
-                medications.filter((med) => med.name.trim() !== "").length ===
-                0 || isSavingTemplate
+                medications.filter((med) => med.name.trim() !== '').length === 0 || isSavingTemplate
               }
             >
               Save As Template
             </Button>
-            <Button
-              type="button"
-              onClick={handleSavePrescription}
-              disabled={true} // Still disabled as per original code
-            >
+            <Button type="button" onClick={() => handlePrint()}>
               Print
             </Button>
           </DialogFooter>
