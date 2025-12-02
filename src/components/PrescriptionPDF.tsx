@@ -1,5 +1,5 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import { EnterpriseData } from '@/interfaces/enterprise';
 import { MedicationData } from '@/interfaces/template';
 
@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     flexDirection: 'column',
+    marginTop: -20,
   },
   headerRight: {
     flexDirection: 'column',
@@ -33,6 +34,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 4,
     color: '#000',
+  },
+  logo: {
+    width: 75,
+    height: 75,
+    marginBottom: -20,
+    objectFit: 'contain',
   },
   doctorName: {
     fontSize: 14,
@@ -85,7 +92,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tableRow: {
-    margin: 'auto',
     flexDirection: 'row',
   },
   tableColHeader: {
@@ -176,6 +182,7 @@ export const PrescriptionPDF = ({
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
+          {clinic?.logoUrl && <Image style={styles.logo} src={clinic.logoUrl} />}
           <Text style={styles.hospitalName}>{clinic?.hospitalName || 'Medical Center'}</Text>
           <Text style={styles.subText}>{clinic?.address || ''}</Text>
           <Text style={styles.subText}>{clinic?.phoneNumber || ''}</Text>
@@ -219,10 +226,10 @@ export const PrescriptionPDF = ({
       <Text style={styles.sectionTitle}>Rx (Medications)</Text>
       <View style={styles.table}>
         <View style={styles.tableRow}>
-          <View style={[styles.tableColHeader, { width: '5%' }]}>
+          <View style={[styles.tableColHeader, { width: '10%' }]}>
             <Text style={styles.tableCellHeader}>#</Text>
           </View>
-          <View style={[styles.tableColHeader, { width: '25%' }]}>
+          <View style={[styles.tableColHeader, { width: '30%' }]}>
             <Text style={styles.tableCellHeader}>Medicine</Text>
           </View>
           <View style={styles.tableColHeader}>
@@ -240,10 +247,10 @@ export const PrescriptionPDF = ({
         </View>
         {medications.map((med, index) => (
           <View style={styles.tableRow} key={index}>
-            <View style={[styles.tableCol, { width: '5%' }]}>
+            <View style={[styles.tableCol, { width: '10%' }]}>
               <Text style={styles.tableCell}>{index + 1}</Text>
             </View>
-            <View style={[styles.tableCol, { width: '25%' }]}>
+            <View style={[styles.tableCol, { width: '30%' }]}>
               <Text style={styles.tableCell}>{med.name}</Text>
             </View>
             <View style={styles.tableCol}>

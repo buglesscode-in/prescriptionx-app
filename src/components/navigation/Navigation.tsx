@@ -56,7 +56,7 @@ export default function Navbar() {
               <Link to="/">Home</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/templates">Home</Link>
+              <Link to="/templates">Templates</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/prescription">New Prescription</Link>
