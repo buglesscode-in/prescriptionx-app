@@ -1,5 +1,3 @@
-// src/pages/EnterpriseScreen.tsx
-
 import { useState, useEffect, useCallback } from 'react';
 import {
   getEnterprisesByUid,
@@ -7,14 +5,6 @@ import {
   EnterpriseData,
 } from '@/firebase/enterpriseService';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,12 +15,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
-import { Edit, Trash2, PlusCircle, Loader2 } from 'lucide-react';
+import { Edit, Trash2, PlusCircle, Loader2, Building2, User, FileBadge } from 'lucide-react';
 import EnterpriseFormModal from '@/components/EnterpriseFormModal';
 import { useAuth } from '@/context/authContextDefinition';
-
-// Define initial state for a clean form
 
 export default function EnterpriseScreen() {
   const { currentUser } = useAuth();
@@ -73,12 +70,10 @@ export default function EnterpriseScreen() {
     setIsModalOpen(true);
   };
 
-  // Prepares the Alert Dialog state
   const prepareSoftDelete = (id: string, hospitalName: string) => {
     setDeleteConfirmation({ id, name: hospitalName });
   };
 
-  // Executes deletion after user confirms in the AlertDialog
   const executeSoftDelete = async () => {
     if (!deleteConfirmation) return;
 
@@ -93,7 +88,7 @@ export default function EnterpriseScreen() {
     } catch (err: any) {
       setError(err.message || `Failed to archive profile: ${name}.`);
     } finally {
-      setDeleteConfirmation(null); // Close the confirmation dialog
+      setDeleteConfirmation(null);
     }
   };
 
@@ -107,80 +102,118 @@ export default function EnterpriseScreen() {
 
   if (loading)
     return (
-      <div className="p-8 flex items-center justify-center">
-        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-        <p className="text-xl text-gray-600 dark:text-gray-400">Loading Enterprise List...</p>
+      <div className="h-[calc(100vh-4rem)] flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-xl font-medium text-muted-foreground">Loading Hospital Settings...</p>
       </div>
     );
 
   return (
-    <div className="max-w-6xl mx-0 md:mx-auto space-y-4 p-0">
-      {/* Table Header and Create Button (Responsive Stacking) */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 space-y-4 sm:space-y-0">
-        <h2 className="text-2xl sm:text-3xl font-bold">Managed Enterprise Profiles</h2>
-        <Button onClick={handleCreate} className="w-full sm:w-auto">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create New Profile
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Hospital Settings</h1>
+          <p className="text-muted-foreground mt-1">Manage your clinic and doctor profiles.</p>
+        </div>
+        <Button
+          onClick={handleCreate}
+          size="lg"
+          className="gap-2 shadow-lg hover:shadow-xl transition-all"
+        >
+          <PlusCircle className="h-5 w-5" />
+          Create Profile
         </Button>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-100 dark:bg-red-900 border border-destructive rounded-md text-destructive dark:text-red-300">
-          Error: {error}
+        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive flex items-center gap-2">
+          <span>Error: {error}</span>
         </div>
       )}
 
-      {/* Enterprise Table (Responsive Scroll) */}
-      <div className="border rounded-lg overflow-x-auto">
-        <Table className="min-w-full">
-          {' '}
-          {/* min-w-full ensures it takes full width for scroll */}
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead>Hospital Name</TableHead>
-              {/* 💥 HIDDEN ON MOBILE 💥 */}
-              <TableHead className="hidden sm:table-cell">Doctor</TableHead>
-              <TableHead className="hidden sm:table-cell">License No.</TableHead>
-              <TableHead className="w-[120px] sm:w-[150px] text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {enterprises.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                  No active enterprise profiles found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              enterprises.map((enterprise) => (
-                <TableRow key={enterprise.id}>
-                  <TableCell className="font-medium">{enterprise.hospitalName}</TableCell>
-                  {/* 💥 HIDDEN ON MOBILE 💥 */}
-                  <TableCell className="hidden sm:table-cell">{enterprise.doctorName}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{enterprise.licenseNumber}</TableCell>
-
-                  {/* Action Buttons (Condensed on Mobile) */}
-                  <TableCell className="text-right space-x-1 sm:space-x-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEdit(enterprise)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-
-                    {enterprise.id && (
-                      <Button
-                        variant="destructive"
-                        size="icon" // 💥 Change to icon size 💥
-                        onClick={() => prepareSoftDelete(enterprise.id!, enterprise.hospitalName)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+      {/* Enterprise Grid */}
+      {enterprises.length === 0 ? (
+        <div className="text-center py-20 border-2 border-dashed rounded-xl bg-muted/30">
+          <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4 opacity-50" />
+          <h3 className="text-lg font-medium">No profiles found</h3>
+          <p className="text-muted-foreground mt-1">
+            Create a hospital profile to start generating prescriptions.
+          </p>
+          <Button variant="link" onClick={handleCreate} className="mt-2 text-primary">
+            Create First Profile
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {enterprises.map((enterprise) => (
+            <Card
+              key={enterprise.id}
+              className="group hover:shadow-lg transition-all duration-300 border-muted/60 hover:border-primary/50"
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    {enterprise.logoUrl ? (
+                      <div className="h-14 w-14 rounded-lg border bg-white flex items-center justify-center overflow-hidden p-1 shadow-sm">
+                        <img
+                          src={enterprise.logoUrl}
+                          alt={`${enterprise.hospitalName} logo`}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-14 w-14 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Building2 className="h-7 w-7 text-primary" />
+                      </div>
                     )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  </div>
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <CardTitle className="text-lg font-bold truncate leading-tight">
+                      {enterprise.hospitalName}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2 text-xs">
+                      {enterprise.address}
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pb-3 space-y-3">
+                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 p-2 rounded-md">
+                  <User className="h-4 w-4 text-primary/70" />
+                  <span className="font-medium text-foreground">{enterprise.doctorName}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 p-2 rounded-md">
+                  <FileBadge className="h-4 w-4 text-primary/70" />
+                  <span className="font-mono text-xs">{enterprise.licenseNumber}</span>
+                </div>
+              </CardContent>
+              <CardFooter className="pt-3 border-t bg-muted/20 flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEdit(enterprise)}
+                  className="hover:bg-primary/10 hover:text-primary"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+                {enterprise.id && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => prepareSoftDelete(enterprise.id!, enterprise.hospitalName)}
+                    className="hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Form Modal */}
       <EnterpriseFormModal
@@ -190,14 +223,15 @@ export default function EnterpriseScreen() {
         userUid={currentUser?.uid || ''}
       />
 
-      {/* ALERT DIALOG COMPONENT */}
+      {/* Alert Dialog */}
       <AlertDialog open={!!deleteConfirmation} onOpenChange={() => setDeleteConfirmation(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Profile?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action will delete the profile for
-              <span className="font-semibold text-destructive"> {deleteConfirmation?.name}</span>.
+              This will delete the profile for{' '}
+              <span className="font-semibold text-foreground">"{deleteConfirmation?.name}"</span>.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -206,7 +240,7 @@ export default function EnterpriseScreen() {
               onClick={executeSoftDelete}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Yes, Delete
+              Delete Profile
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

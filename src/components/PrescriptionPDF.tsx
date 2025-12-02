@@ -11,14 +11,15 @@ const styles = StyleSheet.create({
     padding: 40,
     fontSize: 10,
     fontFamily: 'Helvetica',
-    color: '#333',
+    color: '#0F172A', // Slate-900
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#E2E8F0', // Slate-200
     paddingBottom: 10,
   },
   headerLeft: {
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
-    color: '#000',
+    color: '#4F46E5', // Indigo-600 (Primary)
   },
   logo: {
     width: 75,
@@ -45,18 +46,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 2,
+    color: '#1E293B', // Slate-800
   },
   subText: {
     fontSize: 10,
-    color: '#666',
+    color: '#64748B', // Slate-500
   },
   patientInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 4,
+    padding: 12,
+    backgroundColor: '#F8FAFC', // Slate-50
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#F1F5F9', // Slate-100
   },
   patientInfoCol: {
     flexDirection: 'column',
@@ -64,21 +68,24 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 8,
-    color: '#888',
+    color: '#64748B', // Slate-500
     marginBottom: 1,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   value: {
     fontSize: 10,
-    fontWeight: 'medium',
+    fontWeight: 'bold',
+    color: '#334155', // Slate-700
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 8,
     marginTop: 10,
-    color: '#d32f2f', // Red color for titles like 'Rx'
+    color: '#4F46E5', // Indigo-600 (Primary)
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#E2E8F0', // Slate-200
     paddingBottom: 4,
   },
   table: {
@@ -86,10 +93,12 @@ const styles = StyleSheet.create({
     width: 'auto',
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#E2E8F0', // Slate-200
     borderRightWidth: 0,
     borderBottomWidth: 0,
     marginBottom: 20,
+    borderRadius: 4,
+    overflow: 'hidden',
   },
   tableRow: {
     flexDirection: 'row',
@@ -100,9 +109,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    borderColor: '#e0e0e0',
-    backgroundColor: '#f5f5f5',
-    padding: 5,
+    borderColor: '#E2E8F0', // Slate-200
+    backgroundColor: '#F1F5F9', // Slate-100
+    padding: 8,
   },
   tableCol: {
     width: '15%',
@@ -110,33 +119,29 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderLeftWidth: 0,
     borderTopWidth: 0,
-    borderColor: '#e0e0e0',
-    padding: 5,
-  },
-  tableColWide: {
-    width: '25%',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderColor: '#e0e0e0',
-    padding: 5,
+    borderColor: '#E2E8F0', // Slate-200
+    padding: 8,
   },
   tableCellHeader: {
     margin: 'auto',
     fontSize: 9,
     fontWeight: 'bold',
+    color: '#475569', // Slate-600
   },
   tableCell: {
     margin: 'auto',
     fontSize: 9,
+    color: '#334155', // Slate-700
   },
   adviceSection: {
     marginTop: 10,
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 4,
+    borderColor: '#E2E8F0', // Slate-200
+    borderRadius: 6,
+    backgroundColor: '#F8FAFC', // Slate-50
+    color: '#334155', // Slate-700
+    lineHeight: 1.5,
   },
   footer: {
     position: 'absolute',
@@ -145,9 +150,9 @@ const styles = StyleSheet.create({
     right: 40,
     textAlign: 'center',
     fontSize: 8,
-    color: '#aaa',
+    color: '#94A3B8', // Slate-400
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: '#E2E8F0', // Slate-200
     paddingTop: 10,
   },
 });
