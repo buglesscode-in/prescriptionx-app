@@ -24,5 +24,5 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   }
 
   // 3. If user is NOT logged in, redirect them to the /login page
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/" replace />;
 };

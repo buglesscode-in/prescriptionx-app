@@ -89,7 +89,7 @@ export default function Navbar() {
               <div className="h-px bg-border my-2" />
               <DropdownMenuItem asChild>
                 <div className="w-full">
-                  <SignOutButton />
+                  <SignOutButton className="w-full justify-start" />
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
