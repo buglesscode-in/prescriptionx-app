@@ -8,14 +8,34 @@ import {
   Zap,
   ShieldCheck,
   Printer,
-  CheckCircle2,
+  Pill,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
-const HomeScreen = () => {
+import Footer from '@/components/Footer';
+
+const LandingPage = () => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background font-sans antialiased">
+      {/* Public Header */}
+      <header className="sticky top-0 z-50 w-full glass border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="font-bold text-xl tracking-tight text-foreground">
+              Prescription<span className="text-primary">X</span>
+            </span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Button asChild>
+              <Link to="/login">Sign In</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-6 relative z-10">
@@ -34,7 +54,7 @@ const HomeScreen = () => {
                 size="lg"
                 className="gap-2 w-full sm:w-auto text-lg h-12 px-8 shadow-lg shadow-primary/20"
               >
-                <Link to="/prescription">
+                <Link to="/login">
                   <PlusCircle className="h-5 w-5" />
                   Create Prescription
                 </Link>
@@ -45,7 +65,7 @@ const HomeScreen = () => {
                 size="lg"
                 className="gap-2 w-full sm:w-auto text-lg h-12 px-8 bg-background/50 backdrop-blur-sm"
               >
-                <Link to="/templates">
+                <Link to="/login">
                   <FileText className="h-5 w-5" />
                   Manage Templates
                 </Link>
@@ -59,7 +79,7 @@ const HomeScreen = () => {
       </section>
 
       <div className="container mx-auto px-6 space-y-24 pb-20">
-        {/* Quick Actions Grid */}
+        {/* Quick Actions Grid (Preview) */}
         <section className="-mt-16 relative z-20">
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="hover:shadow-xl transition-all duration-300 border-t-4 border-t-primary bg-card/50 backdrop-blur-sm">
@@ -80,7 +100,7 @@ const HomeScreen = () => {
                   variant="ghost"
                   className="w-full justify-between group hover:bg-primary/5"
                 >
-                  <Link to="/prescription">
+                  <Link to="/login">
                     Start Now
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -106,7 +126,7 @@ const HomeScreen = () => {
                   variant="ghost"
                   className="w-full justify-between group hover:bg-blue-500/5"
                 >
-                  <Link to="/templates">
+                  <Link to="/login">
                     View Templates
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -132,7 +152,7 @@ const HomeScreen = () => {
                   variant="ghost"
                   className="w-full justify-between group hover:bg-indigo-500/5"
                 >
-                  <Link to="/enterprise">
+                  <Link to="/login">
                     Manage Settings
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -230,8 +250,9 @@ const HomeScreen = () => {
           </div>
         </section>
       </div>
+      <Footer />
     </div>
   );
 };
 
-export default HomeScreen;
+export default LandingPage;

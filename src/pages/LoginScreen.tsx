@@ -24,7 +24,7 @@ export default function LoginScreen() {
   // 1. Redirect if user is already logged in (NO CHANGE)
   useEffect(() => {
     if (!authLoading && currentUser) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [currentUser, authLoading, navigate]);
 

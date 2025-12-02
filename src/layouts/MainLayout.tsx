@@ -1,24 +1,15 @@
-// src/layouts/MainLayout.tsx
-
-import { Link, Outlet } from 'react-router-dom'; // 👈 IMPORT THE THEME TOGGLER
+import { Outlet } from 'react-router-dom';
 import Navigation from '../components/navigation/Navigation';
+import Footer from '../components/Footer';
 
 export default function MainLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* --- Header/Navigation Bar (Your Sexy Header) --- */}
-      <header className="flex items-center justify-between border-b p-4 shadow-sm bg-white dark:bg-gray-800">
-        <Link to="/" className="text-xl font-bold text-gray-900 dark:text-gray-100">
-          PrescriptionX
-        </Link>
-
-        <Navigation />
-      </header>
-
-      {/* 💥 Outlet renders the current child route content 💥 */}
-      <main className="p-8">
+    <div className="min-h-screen bg-background font-sans antialiased flex flex-col">
+      <Navigation />
+      <main className="flex-1">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }

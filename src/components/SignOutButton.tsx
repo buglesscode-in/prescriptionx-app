@@ -3,8 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { logoutUser } from '@/firebase/auth'; // Ensure this path is correct
 import { LogOut } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export default function SignOutButton() {
+interface SignOutButtonProps {
+  className?: string;
+}
+
+export default function SignOutButton({ className }: SignOutButtonProps) {
   const handleSignOut = async () => {
     try {
       await logoutUser();
@@ -17,9 +22,10 @@ export default function SignOutButton() {
 
   return (
     <Button
-      variant="destructive" // Use the red color variant for a clear action
+      variant="ghost"
       size="sm"
       onClick={handleSignOut}
+      className={cn('text-muted-foreground hover:text-foreground', className)}
     >
       <LogOut className="mr-2 h-4 w-4" />
       Sign Out
