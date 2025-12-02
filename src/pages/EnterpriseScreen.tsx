@@ -206,7 +206,7 @@ export default function EnterpriseScreen() {
               onClick={executeSoftDelete}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Yes, Soft Delete
+              Yes, Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
