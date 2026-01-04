@@ -37,22 +37,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/features" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Features
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/pricing" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/testimonials" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Testimonials
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/faq" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   FAQ
                 </Link>
               </li>
@@ -65,22 +65,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/about" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/careers" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Careers
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/blog" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/contact" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Contact
                 </Link>
               </li>
@@ -93,17 +93,17 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/terms" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-primary transition-colors">
+                <Link to="/cookies" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Cookie Policy
                 </Link>
               </li>
@@ -114,13 +114,13 @@ export default function Footer() {
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
           <p>© {new Date().getFullYear()} PrescriptionX. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link to="#" className="hover:text-foreground transition-colors">
+            <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
               Privacy
             </Link>
-            <Link to="#" className="hover:text-foreground transition-colors">
+            <Link to="/terms" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
               Terms
             </Link>
-            <Link to="#" className="hover:text-foreground transition-colors">
+            <Link to="/sitemap" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
               Sitemap
             </Link>
           </div>
